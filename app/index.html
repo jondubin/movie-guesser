@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <!-- <link rel="icon" href="../../favicon.ico"> -->
+
+        <title>Narrow Jumbotron Template for Bootstrap</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+        <!-- Custom styles for this template -->
+        <link href="jumbotron-narrow.css" rel="stylesheet">
+
+    </head>
+
+    <body>
+
+        <div class="container">
+            <div class="header clearfix">
+                <nav>
+                    <ul class="nav nav-pills pull-right">
+                        <li role="presentation" class="active"><a href="#">Game</a></li>
+                        <li role="presentation"><a href="#">High Scores</a></li>
+                    </ul>
+                </nav>
+                <h3 class="text-muted">Movie Guessr</h3>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">To play the game, first type in an actor name </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div id="select-col" class="col-lg-6">
+                            <div id="choose-actor">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="e.g. Tom Cruise">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button">Go!</button>
+                                    </span>
+                                </div><!-- /input-group -->
+                            </div>
+
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div id="first-col" class="col-lg-6">
+                            <ul id="first-col-ul" class="list-group">
+
+
+                            </ul>
+                        </div>
+                        <div id="second-col" class="col-lg-6">
+                            <ul class="list-group" id="second-col-ul">
+
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <footer class="footer">
+                <p>Movie Guessr 2015</p>
+            </footer>
+
+        </div> <!-- /container -->
+
+        <script type="text/template" id="guessHtml">
+            <div class="input-group">
+                <input type="text" class="form-control" id="guess" placeholder="Start guessing!">
+                <span class="input-group-addon">Score: <b><span id="score">0</span></b></span>
+            </div>
+        </script>
+
+        <script>
+         var movie_list = ["Mission impossible", "Top gun", "Jack reacher", "valkyrie", "last samurai"];
+
+
+         $("#choose-actor button").click(function() {
+             var actor = $("#choose-actor input").val();
+             console.log(actor);
+             var guessHtml = $("#guessHtml").html();
+             $("#choose-actor").html(guessHtml);
+             $("#select-col").attr('class', 'col-lg-12');
+
+             var use_first_col = true;
+
+             for (var i = 0; i < Math.min(12, movie_list.length); i++){
+                 var badgeHtml = "<span class='badge'>" + movie_list[i].length + "</span>";
+                 var nameHtml = "<span class='movie-name' style='visibility:hidden'>" + movie_list[i] + "</span>";
+                 var col;
+                 if (use_first_col) {
+                     col = "#first-col";
+                 } else {
+                     col = "#second-col";
+                 }
+                 use_first_col = !use_first_col;
+                 $(col + " .list-group").append("<li class='list-group-item'>" + badgeHtml + nameHtml + "</li>");
+             }
+
+             $("#guess").bind('input', function() {
+                 var guess = $("#guess").val().toLowerCase();
+                 $("#first-col-ul li").each(function() {
+                     if ($(this).find(".movie-name").text().toLowerCase() === guess) {
+                         $(this).find(".movie-name").attr('style', "");
+                         $("#guess").val("");
+
+                         var oldScore = parseInt($("#score").text());
+                         $("#score").text(oldScore + 10);
+                     }
+                 });
+
+                 $("#second-col-ul li").each(function() {
+                     if ($(this).find(".movie-name").text().toLowerCase() === guess) {
+                         $(this).find(".movie-name").attr('style', "");
+                         $("#guess").val("");
+                         var oldScore = parseInt($("#score").text());
+                         $("#score").text(oldScore + 10);
+                     }
+                 });
+             });
+         });
+
+
+
+        </script>
+
+
+    </body>
+</html>
