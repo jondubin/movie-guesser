@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -124,7 +124,7 @@
                  return;
              }
              var guessHtml = $("#guessHtml").html();
-             var totalTimeSeconds = 10; //15 * movie_list.length;
+             var totalTimeSeconds = 15 * movie_list.length;
              $(".panel-title").text("Guess movies that " + actor + " was in" );
              $("#choose-actor").html(guessHtml.replace("{{time}}", totalTimeSeconds));
              $("#select-col").attr('class', 'col-lg-12');
