@@ -9,11 +9,12 @@
         <meta name="author" content="">
         <!-- <link rel="icon" href="../../favicon.ico"> -->
 
-        <title>Narrow Jumbotron Template for Bootstrap</title>
+        <title>Movie Guessr</title>
 
         <!-- Bootstrap core CSS -->
-        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
         <!-- Custom styles for this template -->
         <link href="jumbotron-narrow.css" rel="stylesheet">
@@ -68,31 +69,64 @@
                 </div>
             </div>
 
-
-
-
             <footer class="footer">
                 <p>Movie Guessr 2015</p>
             </footer>
+
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="myModalLabel">Submit your score of <span id="modalScore"></span></h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <label for="nameForm">Name:</label>
+                                    <input class="form-control" type="text" id="nameForm"></input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="play-again" class="btn btn-success">Play again</button>
+                            <button type="button" id="submit-score" class="btn btn-primary">Submit score</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </div> <!-- /container -->
 
         <script type="text/template" id="guessHtml">
             <div class="input-group">
-                <input type="text" class="form-control" id="guess" placeholder="Start guessing!">
                 <span class="input-group-addon">Score: <b><span id="score">0</span></b></span>
+                <input type="text" class="form-control" id="guess" placeholder="Start guessing!">
+                <span class="input-group-addon">Time: <b><span id="time">{{time}}</span></b></span>
             </div>
         </script>
 
         <script>
          var movie_list = ["Mission impossible", "Top gun", "Jack reacher", "valkyrie", "last samurai"];
+         movie_list = movie_list.splice(0, 11);
 
+         $("#play-again").click(function() {
+             location.reload();
+         });
+
+         $("#submit-score").click(function() {
+             // TODO: submit score
+             location.reload();
+         });
 
          $("#choose-actor button").click(function() {
              var actor = $("#choose-actor input").val();
-             console.log(actor);
+             if ($.trim(actor).length === 0) {
+                 return;
+             }
              var guessHtml = $("#guessHtml").html();
-             $("#choose-actor").html(guessHtml);
+             var totalTimeSeconds = 10; //15 * movie_list.length;
+             $(".panel-title").text("Guess movies that " + actor + " was in" );
+             $("#choose-actor").html(guessHtml.replace("{{time}}", totalTimeSeconds));
              $("#select-col").attr('class', 'col-lg-12');
 
              var use_first_col = true;
@@ -131,6 +165,20 @@
                      }
                  });
              });
+
+             var timer = setInterval(function() {
+                 totalTimeSeconds--;
+                 if (totalTimeSeconds < 0) {
+                     clearInterval(timer);
+                     $("#guess").attr("placeholder", "Time's up!");
+                     $("#guess").prop('disabled', true);
+                     $("#modalScore").html($("#score").text());
+                     $("#myModal").modal({backdrop: 'static', keyboard: false});
+                 } else {
+                     $("#time").html(totalTimeSeconds);
+                 }
+             }, 1000);
+
          });
 
 
