@@ -17,7 +17,7 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
         <!-- Custom styles for this template -->
-        <link href="jumbotron-narrow.css" rel="stylesheet">
+        <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
 
     </head>
 
@@ -55,14 +55,10 @@
                     <div class="row">
                         <div id="first-col" class="col-lg-6">
                             <ul id="first-col-ul" class="list-group">
-
-
                             </ul>
                         </div>
                         <div id="second-col" class="col-lg-6">
                             <ul class="list-group" id="second-col-ul">
-
-
                             </ul>
                         </div>
                     </div>
@@ -97,6 +93,15 @@
 
         </div> <!-- /container -->
 
+        <script type="text/template" id="gameView">
+
+        </script>
+
+        <script type="text/template" id="gameView">
+
+        </script>
+
+
         <script type="text/template" id="guessHtml">
             <div class="input-group">
                 <span class="input-group-addon">Score: <b><span id="score">0</span></b></span>
@@ -118,19 +123,25 @@
              location.reload();
          });
 
+         $("#choose-actor input").keydown(function(event) {
+             if (event.keyCode == 13)  {
+                 $("#choose-actor button").trigger('click');
+             }
+         });
+
          $("#choose-actor button").click(function() {
              var actor = $("#choose-actor input").val();
              if ($.trim(actor).length === 0) {
                  return;
              }
              var guessHtml = $("#guessHtml").html();
-             var totalTimeSeconds = 15 * movie_list.length;
+             var totalTimeSeconds = 15 ;//* movie_list.length;
              $(".panel-title").text("Guess movies that " + actor + " was in" );
              $("#choose-actor").html(guessHtml.replace("{{time}}", totalTimeSeconds));
              $("#select-col").attr('class', 'col-lg-12');
 
              var use_first_col = true;
-
+             var guessed = {};
              for (var i = 0; i < Math.min(12, movie_list.length); i++){
                  var badgeHtml = "<span class='badge'>" + movie_list[i].length + "</span>";
                  var nameHtml = "<span class='movie-name' style='visibility:hidden'>" + movie_list[i] + "</span>";
@@ -146,11 +157,14 @@
 
              $("#guess").bind('input', function() {
                  var guess = $("#guess").val().toLowerCase();
+                 if (guessed[guess]) {
+                     return;
+                 }
                  $("#first-col-ul li").each(function() {
                      if ($(this).find(".movie-name").text().toLowerCase() === guess) {
                          $(this).find(".movie-name").attr('style', "");
                          $("#guess").val("");
-
+                         guessed[guess] = true;
                          var oldScore = parseInt($("#score").text());
                          $("#score").text(oldScore + 10);
                      }
@@ -160,6 +174,7 @@
                      if ($(this).find(".movie-name").text().toLowerCase() === guess) {
                          $(this).find(".movie-name").attr('style', "");
                          $("#guess").val("");
+                         guessed[guess] = true;
                          var oldScore = parseInt($("#score").text());
                          $("#score").text(oldScore + 10);
                      }
