@@ -1,10 +1,12 @@
 from flask import Flask, render_template, jsonify, request, send_file
+from datetime import datetime
+from operator import itemgetter
 from populate_db import engine
 from sqlalchemy import and_, select, func
 from populate_db import actors, movies, acts
 import random
 from StringIO import StringIO
-
+import string
 from movie_guessr import app
 from movie_guessr import conn
 from movie_guessr import r
@@ -41,7 +43,7 @@ def get_actor_movies(name):
     return get_movies_from_id(actor_id)
 
 
-def get_actor_with_movies(results):
+def get_actor_with_3_movies(results):
     # stmt = select.order_by(func.rand([actors.c.actor_id])).limit(1)
     for result in results:
         actor_name = result[1]
@@ -62,7 +64,7 @@ def get_random_actor():
     while True:
         query = "select actor_id, name from actors ORDER BY rand() limit 200"
         results = engine.execute(query)
-        actor = get_actor_with_movies(results)
+        actor = get_actor_with_3_movies(results)
         if actor:
             return actor
 
@@ -83,9 +85,43 @@ def get_poster():
 def get_movies():
     name = request.args.get('name')
     movies = get_actor_movies(name)
-    return jsonify({'movies': movies})
 
+    return jsonify({'name': string.capwords(name),
+                    'movies': movies})
+
+
+@app.route('/add_score', methods=['POST', 'GET'])
+def add_score():
+    content = request.get_json()
+    print content
+    user = content['name']
+    score = content['score']
+    curr_time = str(datetime.now())
+    value = str(score) + "|" + curr_time + "|" + user
+    r.rpush('scores', value)
+    return jsonify({})
+
+@app.route('/get_scores')
+def get_high_scores():
+    all_scores = r.lrange('scores', 0, -1)
+    scores = []
+    for score in all_scores:
+        curr_score = {}
+        entry_values =  score.split('|')
+        curr_score['score'] = entry_values[0]
+        curr_score['time'] = entry_values[1]
+        curr_score['user'] = entry_values[2]
+        scores.append(curr_score)
+
+    newlist = sorted(scores, key=itemgetter('score'), reverse=True)
+    return_val = {}
+    return_val['scores'] = newlist
+    return jsonify(return_val)
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/high-scores')
+def high_scores():
+    return render_template('high_scores.html')

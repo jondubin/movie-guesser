@@ -2,9 +2,9 @@ from movie_guessr import r
 from flask import send_file
 import requests
 from StringIO import StringIO
-from bing_search_api import BingSearchAPI
 import tmdbsimple as tmdb
 from config import *
+from bing_search_api import BingSearchAPI
 
 tmdb.API_KEY = tmdb_api
 
