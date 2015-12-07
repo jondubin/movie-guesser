@@ -1,5 +1,5 @@
 <DOCTYPE html>
-<html lang="en">
+    <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -23,224 +23,239 @@
 
     <body>
 
-        <div class="container">
-            <div class="header clearfix">
-                <nav>
-                    <ul class="nav nav-pills pull-right">
-                        <li role="presentation" class="active"><a href="#">Game</a></li>
-                        <li role="presentation"><a href="/high-scores">High Scores</a></li>
-                    </ul>
-                </nav>
-                <h3 class="text-muted">Movie Guessr</h3>
+    <div class="container">
+        <div class="header clearfix">
+            <nav>
+                <ul class="nav nav-pills pull-right">
+                    <li role="presentation" class="active"><a href="#">Game</a></li>
+                    <li role="presentation"><a href="/high-scores">High Scores</a></li>
+                </ul>
+            </nav>
+            <h3 class="text-muted">Movie Guessr</h3>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">To play the game, first type in an actor name </h3>
             </div>
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">To play the game, first type in an actor name </h3>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div id="select-col" class="col-lg-6">
-                            <div id="choose-actor">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="e.g. Tom Cruise">
+            <div class="panel-body">
+                <div class="row">
+                    <div id="select-col" class="col-lg-6">
+                        <div id="choose-actor">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="e.g. Tom Cruise">
                                     <span class="input-group-btn">
                                         <button class="btn btn-default" type="button">Go!</button>
                                     </span>
-                                </div><!-- /input-group -->
-                            </div>
+                            </div><!-- /input-group -->
+                        </div>
 
-                        </div>
                     </div>
-                    <br>
-                    <div class="row">
-                        <div id="first-col" class="col-lg-6">
-                            <ul id="first-col-ul" class="list-group">
-                            </ul>
-                        </div>
-                        <div id="second-col" class="col-lg-6">
-                            <ul class="list-group" id="second-col-ul">
-                            </ul>
-                        </div>
+                    <div>
+                        <button id="go-random" class="btn btn-primary">
+                            <span id="spinner" style='display:none' class="glyphicon glyphicon-refresh spinning"></span> Go random
+                        </button>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div id="first-col" class="col-lg-6">
+                        <ul id="first-col-ul" class="list-group">
+                        </ul>
+                    </div>
+                    <div id="second-col" class="col-lg-6">
+                        <ul class="list-group" id="second-col-ul">
+                        </ul>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <footer class="footer">
-                <p>Movie Guessr 2015</p>
-            </footer>
+        <footer class="footer">
+            <p>Movie Guessr 2015</p>
+        </footer>
 
-            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" id="myModalLabel">Submit your score of <span id="modalScore"></span></h4>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <label for="nameForm">Name:</label>
-                                    <input id="name" class="form-control" type="text" id="nameForm"></input>
-                                </div>
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Submit your score of <span id="modalScore"></span></h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <label for="nameForm">Name:</label>
+                                <input id="name" class="form-control" type="text" id="nameForm"></input>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" id="play-again" class="btn btn-success">Play again</button>
-                            <button type="button" id="submit-score" class="btn btn-primary">Submit score</button>
-                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="play-again" class="btn btn-success">Play again</button>
+                        <button type="button" id="submit-score" class="btn btn-primary">Submit score</button>
                     </div>
                 </div>
             </div>
+        </div>
 
-        </div> <!-- /container -->
-
-
-        <script type="text/template" id="guessHtml">
-            <div class="input-group">
-                <span class="input-group-addon">Score: <b><span id="score">0</span></b></span>
-                <input type="text" class="form-control" id="guess" placeholder="Start guessing!">
-                <span class="input-group-addon">Time: <b><span id="time"></span></b></span>
-            </div>
-        </script>
-
-        <script>
-         $("#play-again").click(function() {
-             location.reload();
-         });
-
-         $("#submit-score").click(function() {
-             var name = $('#name').val();
-             var score = $('#score').text();
-             console.log(score);
-             console.log(name);
-
-             $.ajax({
-                 method: "POST",
-                 contentType: "application/json; charset=utf-8",
-                 url: "/add_score",
-                 data: JSON.stringify({ name: name, score: score })
-             })
-              .done(function() {
-                  location.reload();
-              });
-         });
-
-         $("#choose-actor input").keydown(function(event) {
-             if (event.keyCode == 13)  {
-                 $("#choose-actor button").trigger('click');
-             }
-         });
-
-         var calcTime = function(numMovies) {
-             var total = 0;
-             var increment = 20;
-             for (var i = 0; i < numMovies; i++) {
-                 total += increment;
-                 increment *= 0.80;
-             }
-             return Math.round(total);
-         }
-
-         var setGameUp = function(actor, movie_list) {
-             var guessHtml = $("#guessHtml").html();
-             var totalTimeSeconds = 15; //calcTime(movie_list.length);
-             $(".panel-title").text("Guess movies that " + actor + " was in" );
-             $("#choose-actor").html(guessHtml);
-             $("#time").html(totalTimeSeconds);
-             $("#select-col").attr('class', 'col-lg-12');
-
-             var use_first_col = true;
-             var guessed = {};
-             for (var i = 0; i < movie_list.length; i++){
-                 var badgeHtml = "<span class='badge'>" + movie_list[i].length + "</span>";
-                 var nameHtml = "<span class='movie-name' style='visibility:hidden'>" + movie_list[i] + "</span>";
-                 var col;
-                 if (use_first_col) {
-                     col = "#first-col";
-                 } else {
-                     col = "#second-col";
-                 }
-                 use_first_col = !use_first_col;
-                 $(col + " .list-group").append("<li class='list-group-item'>" + badgeHtml + nameHtml + "</li>");
-             }
-
-             $("#guess").bind('input', function() {
-                 var guess = $("#guess").val().toLowerCase();
-                 if (guessed[guess]) {
-                     return;
-                 }
-                 $("#first-col-ul li").each(function() {
-                     if ($(this).find(".movie-name").text().toLowerCase() === guess) {
-                         $(this).find(".movie-name").attr('style', "");
-                         $("#guess").val("");
-                         guessed[guess] = true;
-                         var oldScore = parseInt($("#score").text());
-                         $("#score").text(oldScore + 10);
-                     }
-                 });
-
-                 $("#second-col-ul li").each(function() {
-                     if ($(this).find(".movie-name").text().toLowerCase() === guess) {
-                         $(this).find(".movie-name").attr('style', "");
-                         $("#guess").val("");
-                         guessed[guess] = true;
-                         var oldScore = parseInt($("#score").text());
-                         $("#score").text(oldScore + 10);
-                     }
-                 });
-             });
-
-             var timer = setInterval(function() {
-                 totalTimeSeconds--;
-                 if (totalTimeSeconds < 0) {
-                     clearInterval(timer);
-                     $("#guess").attr("placeholder", "Time's up!");
-                     $("#guess").prop('disabled', true);
-                     $("#modalScore").html($("#score").text());
-                     $("#myModal").modal({backdrop: 'static', keyboard: false});
-                 } else {
-                     $("#time").html(totalTimeSeconds);
-                 }
-             }, 1000);
-         }
-
-         function getRandom(arr, n) {
-             var result = new Array(n),
-                 len = arr.length,
-                 taken = new Array(len);
-             if (n > len)
-                 throw new RangeError("getRandom: more elements taken than available");
-             while (n--) {
-                 var x = Math.floor(Math.random() * len);
-                 result[n] = arr[x in taken ? taken[x] : x];
-                 taken[x] = --len;
-             }
-             return result;
-
-         }
-
-         var trimMovies = function(movies) {
-             if (movies.length < 20) {
-                 return movies;
-             } else {
-                 return getRandom(movies, 20);
-             }
-         }
-
-         $("#choose-actor button").click(function() {
-             var actor = $("#choose-actor input").val();
-             if ($.trim(actor).length === 0) {
-                 return;
-             }
-             $.get("/get_movies?name=" + actor, function (data) {
-                movies = data.movies;
-                setGameUp(data.name, trimMovies(movies))
-             });
-         });
+    </div> <!-- /container -->
 
 
+    <script type="text/template" id="guessHtml">
+        <div class="input-group">
+            <span class="input-group-addon">Score: <b><span id="score">0</span></b></span>
+            <input type="text" class="form-control" id="guess" placeholder="Start guessing!">
+            <span class="input-group-addon">Time: <b><span id="time"></span></b></span>
+        </div>
+    </script>
 
-        </script>
+    <script>
+        $("#play-again").click(function() {
+            location.reload();
+        });
+
+        $("#submit-score").click(function() {
+            var name = $('#name').val();
+            var score = $('#score').text();
+            console.log(score);
+            console.log(name);
+
+            $.ajax({
+                method: "POST",
+                contentType: "application/json; charset=utf-8",
+                url: "/add_score",
+                data: JSON.stringify({ name: name, score: score })
+            })
+                    .done(function() {
+                        location.reload();
+                    });
+        });
+
+        $("#choose-actor input").keydown(function(event) {
+            if (event.keyCode == 13)  {
+                $("#choose-actor button").trigger('click');
+            }
+        });
+
+        var calcTime = function(numMovies) {
+            var total = 0;
+            var increment = 20;
+            for (var i = 0; i < numMovies; i++) {
+                total += increment;
+                increment *= 0.80;
+            }
+            return Math.round(total);
+        };
+
+        var setGameUp = function(actor, movie_list) {
+            var guessHtml = $("#guessHtml").html();
+            var totalTimeSeconds = 15; //calcTime(movie_list.length);
+            $(".panel-title").text("Guess movies that " + actor + " was in" );
+            $("#choose-actor").html(guessHtml);
+            $("#go-random").hide();
+            $("#time").html(totalTimeSeconds);
+            $("#select-col").attr('class', 'col-lg-12');
+
+            var use_first_col = true;
+            var guessed = {};
+            for (var i = 0; i < movie_list.length; i++){
+                var badgeHtml = "<span class='badge'>" + movie_list[i].length + "</span>";
+                var nameHtml = "<span class='movie-name' style='visibility:hidden'>" + movie_list[i] + "</span>";
+                var col;
+                if (use_first_col) {
+                    col = "#first-col";
+                } else {
+                    col = "#second-col";
+                }
+                use_first_col = !use_first_col;
+                $(col + " .list-group").append("<li class='list-group-item'>" + badgeHtml + nameHtml + "</li>");
+            }
+
+            $("#guess").bind('input', function() {
+                var guess = $("#guess").val().toLowerCase();
+                if (guessed[guess]) {
+                    return;
+                }
+                $("#first-col-ul li").each(function() {
+                    if ($(this).find(".movie-name").text().toLowerCase() === guess) {
+                        $(this).find(".movie-name").attr('style', "");
+                        $("#guess").val("");
+                        guessed[guess] = true;
+                        var oldScore = parseInt($("#score").text());
+                        $("#score").text(oldScore + 10);
+                    }
+                });
+
+                $("#second-col-ul li").each(function() {
+                    if ($(this).find(".movie-name").text().toLowerCase() === guess) {
+                        $(this).find(".movie-name").attr('style', "");
+                        $("#guess").val("");
+                        guessed[guess] = true;
+                        var oldScore = parseInt($("#score").text());
+                        $("#score").text(oldScore + 10);
+                    }
+                });
+            });
+
+            var timer = setInterval(function() {
+                totalTimeSeconds--;
+                if (totalTimeSeconds < 0) {
+                    clearInterval(timer);
+                    $("#guess").attr("placeholder", "Time's up!");
+                    $("#guess").prop('disabled', true);
+                    $("#modalScore").html($("#score").text());
+                    $("#myModal").modal({backdrop: 'static', keyboard: false});
+                } else {
+                    $("#time").html(totalTimeSeconds);
+                }
+            }, 1000);
+        };
+
+        function getRandom(arr, n) {
+            var result = new Array(n),
+                    len = arr.length,
+                    taken = new Array(len);
+            if (n > len)
+                throw new RangeError("getRandom: more elements taken than available");
+            while (n--) {
+                var x = Math.floor(Math.random() * len);
+                result[n] = arr[x in taken ? taken[x] : x];
+                taken[x] = --len;
+            }
+            return result;
+
+        }
+
+        var trimMovies = function(movies) {
+            if (movies.length < 20) {
+                return movies;
+            } else {
+                return getRandom(movies, 20);
+            }
+        };
+
+        $("#choose-actor button").click(function() {
+            var actor = $("#choose-actor input").val();
+            if ($.trim(actor).length === 0) {
+                return;
+            }
+            $.get("/get_movies?name=" + actor, function (data) {
+                var movies = data.movies;
+                setGameUp(data.name, trimMovies(movies));
+            });
+        });
+
+        $("#go-random").click(function() {
+            $("#spinner").css('display', '');
+            $.get("/get_random", function (data) {
+                var movies = data.movies;
+                setGameUp(data.name, trimMovies(movies));
+            });
+        });
+
+
+
+
+    </script>
 
 
     </body>
-</html>
+    </html>
