@@ -1,1 +1,1 @@
-web: gunicorn movie_guessr:app
+web: python runserver.py
