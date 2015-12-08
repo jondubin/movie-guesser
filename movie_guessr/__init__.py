@@ -2,6 +2,8 @@ from flask import Flask
 import redis
 import os
 import os.path
+import logging
+import sys
 
 if os.path.isfile(os.getcwd() + '/movie_guessr/config.py'):
     import config
@@ -20,6 +22,8 @@ DEBUG = True
 
 from populate_db import engine
 app = Flask(__name__)
+app.logger.addHandler(logging.StreamHandler(sys.stdout))
+app.logger.setLevel(logging.ERROR)
 r = redis.StrictRedis(host=REDIS_URL, port=12890, db=0, password=REDIS_PASSWORD)
 conn = engine.connect()
 
