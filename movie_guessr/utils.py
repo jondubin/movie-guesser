@@ -35,12 +35,13 @@ def get_poster_url(movie_name):
 
 
 def get_actor_url(actor_name):
-        bing = BingSearchAPI(bing_api)
-        params = {'ImageFilters':'"Face:Face"',
-                  '$format': 'json',
-                  '$top': 1,
-                  '$skip': 0}
-        data = bing.search('image',
-                           actor_name,
-                           params).json()
-        return data['d']['results'][0]['Image'][0]['MediaUrl']
+    bing = BingSearchAPI(bing_api)
+    params = {'ImageFilters':'"Face:Face"',
+              '$format': 'json',
+              '$top': 1,
+              '$skip': 0}
+    actor_name = actor_name.encode('utf-8')
+    data = bing.search('image',
+                       actor_name,
+                       params).json()
+    return data['d']['results'][0]['Image'][0]['Thumbnail']['MediaUrl']

@@ -4,9 +4,9 @@ from operator import itemgetter
 from populate_db import engine
 from sqlalchemy import and_, select, func
 from populate_db import actors, movies, acts
-import random
-from StringIO import StringIO
+import MySQLdb
 import string
+import random
 from movie_guessr import app
 from movie_guessr import conn
 from movie_guessr import r
@@ -44,11 +44,13 @@ def get_actor_movies(name):
 
 
 def get_actor_with_3_movies(results):
-    # stmt = select.order_by(func.rand([actors.c.actor_id])).limit(1)
     for result in results:
         actor_name = result[1]
         actor_id = result[0]
-        query = "select name from movies M JOIN acts AC on M.movie_id = AC.movie_id where AC.actor_id = {}".format(actor_id)
+        query = "select name " \
+                "from movies M " \
+                "JOIN acts AC on M.movie_id = AC.movie_id " \
+                "where AC.actor_id = {}".format(actor_id)
         movies = engine.execute(query).fetchall()
         if len(movies) > 3:
             movies = [movie[0] for movie in movies]
@@ -57,6 +59,41 @@ def get_actor_with_3_movies(results):
                 "name": actor_name,
                 "movies": movies
             })
+
+
+def get_cast_excluding(movie_name, excluding):
+    escaped = MySQLdb.escape_string(movie_name)
+    escaped_excluding = MySQLdb.escape_string(excluding)
+    query = "SELECT A.actor_id, A.name " \
+            "FROM actors A " \
+            "JOIN acts AC on AC.actor_id = A.actor_id " \
+            "JOIN movies M on M.movie_id = AC.movie_id " \
+            "WHERE M.name= '{}' AND A.name <> '{}'".format(escaped, escaped_excluding)
+    cast = engine.execute(query).fetchall()
+    return cast
+
+
+@app.route('/get_acts_with')
+def get_acts_with():
+    name = request.args.get('name')
+    actor_movies = get_actor_movies(name)
+    if not actor_movies:
+        return jsonify({})
+    random.shuffle(actor_movies)
+    for movie in actor_movies:
+        cast = get_cast_excluding(movie, name)
+        for actor in cast:
+            actor_id = actor[0]
+            actor_name = actor[1]
+            if actor_name == name:
+                continue
+            cast_movies = get_movies_from_id(actor_id)
+            if len(cast_movies) > 3:
+                return jsonify({'name': actor_name,
+                                 'movies': cast_movies,
+                                 'acts_with': {'name': string.capwords(name),
+                                               'movie': movie}})
+    return jsonify({})
 
 
 @app.route('/get_random')
@@ -78,6 +115,7 @@ def get_actor_photo():
 @app.route('/get_poster_photo')
 def get_poster():
     name = request.args.get('name')
+    print name
     return return_from_cache('posters', get_poster_url, name)
 
 
@@ -85,7 +123,6 @@ def get_poster():
 def get_movies():
     name = request.args.get('name')
     movies = get_actor_movies(name)
-
     return jsonify({'name': string.capwords(name),
                     'movies': movies})
 
@@ -100,6 +137,7 @@ def add_score():
     value = str(score) + "|" + curr_time + "|" + user
     r.rpush('scores', value)
     return jsonify({})
+
 
 @app.route('/get_scores')
 def get_high_scores():
@@ -118,9 +156,11 @@ def get_high_scores():
     return_val['scores'] = newlist
     return jsonify(return_val)
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/high-scores')
 def high_scores():

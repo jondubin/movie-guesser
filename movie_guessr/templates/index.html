@@ -4,10 +4,8 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
         <meta name="description" content="">
         <meta name="author" content="">
-        <!-- <link rel="icon" href="../../favicon.ico"> -->
 
         <title>Movie Guessr</title>
 
@@ -43,16 +41,21 @@
                         <div id="choose-actor">
                             <div class="input-group">
                                 <input type="text" class="form-control" placeholder="e.g. Tom Cruise">
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-default" type="button">Go!</button>
-                                    </span>
+                                <div class="input-group-btn">
+                                    <button id="main-go" class="btn btn-default" type="button">Go!</button>
+                                    <button id="acts-with-go" class="btn btn-default" type="button">
+                                        <span id="acts-with-spinner" style='display:none' class="glyphicon glyphicon-refresh spinning"></span>
+                                        Acts with
+                                    </button>
+                                </div>
+
                             </div><!-- /input-group -->
                         </div>
 
                     </div>
                     <div>
                         <button id="go-random" class="btn btn-primary">
-                            <span id="spinner" style='display:none' class="glyphicon glyphicon-refresh spinning"></span> Go random
+                            <span id="go-random-spinner" style='display:none' class="glyphicon glyphicon-refresh spinning"></span> Go random
                         </button>
                     </div>
                 </div>
@@ -100,10 +103,24 @@
 
 
     <script type="text/template" id="guessHtml">
-        <div class="input-group">
-            <span class="input-group-addon">Score: <b><span id="score">0</span></b></span>
-            <input type="text" class="form-control" id="guess" placeholder="Start guessing!">
-            <span class="input-group-addon">Time: <b><span id="time"></span></b></span>
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="input-group">
+                    <span class="input-group-addon">Score: <b><span id="score">0</span></b></span>
+                    <input type="text" class="form-control" id="guess" placeholder="Start guessing!">
+                    <span class="input-group-addon">Time: <b><span id="time"></span></b></span>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-lg-6">
+                <img class="profile center-block img-thumbnail" id="actor-image">
+            </div>
+            <div class="col-lg-6" id="posters">
+            </div>
+        </div>
         </div>
     </script>
 
@@ -131,7 +148,7 @@
 
         $("#choose-actor input").keydown(function(event) {
             if (event.keyCode == 13)  {
-                $("#choose-actor button").trigger('click');
+                $( '#main-go' ).trigger('click');
             }
         });
 
@@ -145,15 +162,29 @@
             return Math.round(total);
         };
 
-        var setGameUp = function(actor, movie_list) {
+        var setGameUp = function(actor, movie_list, acts_with) {
+            console.log(acts_with);
             var guessHtml = $("#guessHtml").html();
-            var totalTimeSeconds = 15; //calcTime(movie_list.length);
-            $(".panel-title").text("Guess movies that " + actor + " was in" );
+            var totalMovies = movie_list.length;
+            var moviesGuessed = 0;
+            var totalTimeSeconds = calcTime(movie_list.length);
+            var panelText;
+            if (acts_with === undefined) {
+                panelText = "Guess movies that " + actor + " was in"
+            } else {
+                panelText = "Guess movies that " + actor + " was in, who was in " + acts_with.movie + " with " + acts_with.name
+            }
+            $(".panel-title").text(panelText);
             $("#choose-actor").html(guessHtml);
             $("#go-random").hide();
             $("#time").html(totalTimeSeconds);
             $("#select-col").attr('class', 'col-lg-12');
-
+            $.get("/get_actor_photo?name=" + encodeURIComponent(actor));
+            $("#actor-image").attr('src', '/get_actor_photo?name=' + encodeURIComponent(actor));
+            for (var i = 0; i < movie_list.length; i++) {
+                var imageUrl = '/get_poster_photo?name=' + encodeURIComponent(movie_list[i]);
+                $('#posters').append("<img class='profile center-block' style='display:none' id='poster-" + i + "' class='movie-image' src=" + imageUrl + ">");
+            }
             var use_first_col = true;
             var guessed = {};
             for (var i = 0; i < movie_list.length; i++){
@@ -169,93 +200,141 @@
                 $(col + " .list-group").append("<li class='list-group-item'>" + badgeHtml + nameHtml + "</li>");
             }
 
+            function hideAllPosters() {
+                $('#posters img').css('display', 'none');
+            }
+
+            function getMovieIndex(movieName) {
+                var movieNameLower = movieName.toLowerCase();
+                for (var i = 0; i < movie_list.length; i++) {
+                    if (movie_list[i].toLowerCase() === movieNameLower) {
+                        return i;
+                    }
+                }
+            }
+
+            function unhidePoster(movieName) {
+                var idx = getMovieIndex(movieName);
+                var idStr = "#poster-" + idx;
+                $(idStr).css('display', '');
+            }
+
+            function guessRight(that, guess) {
+                if ($(that).find(".movie-name").text().toLowerCase() === guess) {
+                    $(that).find(".movie-name").attr('style', "");
+                    $("#guess").val("");
+                    hideAllPosters();
+                    unhidePoster(guess);
+                    guessed[guess] = true;
+                    moviesGuessed++;
+                    $('.movie-image').attr('src','/get_poster_photo?name=' + encodeURIComponent(guess));
+                    var oldScore = parseInt($("#score").text());
+                    $("#score").text(oldScore + 10);
+                    if (moviesGuessed === totalMovies) {
+                        gameOver();
+                    }
+                }
+            }
+
             $("#guess").bind('input', function() {
                 var guess = $("#guess").val().toLowerCase();
                 if (guessed[guess]) {
                     return;
                 }
                 $("#first-col-ul li").each(function() {
-                    if ($(this).find(".movie-name").text().toLowerCase() === guess) {
-                        $(this).find(".movie-name").attr('style', "");
-                        $("#guess").val("");
-                        guessed[guess] = true;
-                        var oldScore = parseInt($("#score").text());
-                        $("#score").text(oldScore + 10);
-                    }
+                    guessRight(this, guess);
                 });
 
                 $("#second-col-ul li").each(function() {
-                    if ($(this).find(".movie-name").text().toLowerCase() === guess) {
-                        $(this).find(".movie-name").attr('style', "");
-                        $("#guess").val("");
-                        guessed[guess] = true;
-                        var oldScore = parseInt($("#score").text());
-                        $("#score").text(oldScore + 10);
-                    }
+                    guessRight(this, guess);
                 });
             });
+
+            function gameOver() {
+                $("#modalScore").html($("#score").text());
+                $("#myModal").modal({backdrop: 'static', keyboard: false});
+            }
 
             var timer = setInterval(function() {
                 totalTimeSeconds--;
                 if (totalTimeSeconds < 0) {
                     clearInterval(timer);
-                    $("#guess").attr("placeholder", "Time's up!");
-                    $("#guess").prop('disabled', true);
-                    $("#modalScore").html($("#score").text());
-                    $("#myModal").modal({backdrop: 'static', keyboard: false});
+                    gameOver();
                 } else {
                     $("#time").html(totalTimeSeconds);
                 }
             }, 1000);
         };
 
-        function getRandom(arr, n) {
-            var result = new Array(n),
-                    len = arr.length,
-                    taken = new Array(len);
-            if (n > len)
-                throw new RangeError("getRandom: more elements taken than available");
-            while (n--) {
-                var x = Math.floor(Math.random() * len);
-                result[n] = arr[x in taken ? taken[x] : x];
-                taken[x] = --len;
-            }
-            return result;
+        function shuffle(array) {
+            var currentIndex = array.length, temporaryValue, randomIndex ;
 
+            // While there remain elements to shuffle...
+            while (0 !== currentIndex) {
+
+                // Pick a remaining element...
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+
+                // And swap it with the current element.
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+
+            return array;
         }
 
         var trimMovies = function(movies) {
-            if (movies.length < 20) {
-                return movies;
-            } else {
-                return getRandom(movies, 20);
+            var uniqueMovies = [];
+            $.each(movies, function(i, el){
+                if($.inArray(el, uniqueMovies) === -1) uniqueMovies.push(el);
+            });
+            var shuffledMovies = shuffle(uniqueMovies);
+            if (shuffledMovies.length >= 16) {
+                shuffledMovies = shuffledMovies.slice(0, 16);
             }
+            console.log(shuffledMovies);
+            return shuffledMovies;
         };
 
-        $("#choose-actor button").click(function() {
+        $( '#main-go' ).click(function() {
             var actor = $("#choose-actor input").val();
             if ($.trim(actor).length === 0) {
                 return;
             }
-            $.get("/get_movies?name=" + actor, function (data) {
+            $.get("/get_movies?name=" + encodeURIComponent(actor), function (data) {
                 var movies = data.movies;
-                setGameUp(data.name, trimMovies(movies));
+                if (movies !== undefined && movies !== null && movies.length > 0) {
+                    setGameUp(data.name, trimMovies(movies));
+                }
             });
         });
 
-        $("#go-random").click(function() {
-            $("#spinner").css('display', '');
+        $( '#acts-with-go' ).click(function() {
+            var actor = $("#choose-actor input").val();
+            if ($.trim(actor).length === 0) {
+                return;
+            }
+            $( '#acts-with-spinner' ).css( 'display', '' );
+            $.get("/get_acts_with?name=" + actor, function (data) {
+                var movies = data.movies;
+                if (movies !== undefined && movies !== null && movies.length > 0) {
+                    setGameUp(data.name, trimMovies(movies), data.acts_with);
+                }
+            });
+        });
+
+        $( '#go-random' ).click(function() {
+            $( '#go-random-spinner' ).css( 'display', '' );
             $.get("/get_random", function (data) {
                 var movies = data.movies;
-                setGameUp(data.name, trimMovies(movies));
+                if (movies.length > 0) {
+                    setGameUp(data.name, trimMovies(movies));
+                }
             });
         });
-
-
-
-
     </script>
-
 
     </body>
     </html>
