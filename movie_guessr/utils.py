@@ -3,10 +3,10 @@ from flask import send_file
 import requests
 from StringIO import StringIO
 import tmdbsimple as tmdb
-from config import *
+from movie_guessr import TMDB_KEY, BING_KEY
 from bing_search_api import BingSearchAPI
 
-tmdb.API_KEY = tmdb_api
+tmdb.API_KEY = TMDB_KEY
 
 
 def return_from_cache(hash_name, url_fn, key):
@@ -35,7 +35,7 @@ def get_poster_url(movie_name):
 
 
 def get_actor_url(actor_name):
-    bing = BingSearchAPI(bing_api)
+    bing = BingSearchAPI(BING_KEY)
     params = {'ImageFilters':'"Face:Face"',
               '$format': 'json',
               '$top': 1,

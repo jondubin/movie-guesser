@@ -1,8 +1,8 @@
 import json
 from sqlalchemy import (Table, Column, Integer,
-                        String, Unicode, MetaData,
+                        Unicode, MetaData,
                         ForeignKey, create_engine)
-from config import engine_url
+from movie_guessr import ENGINE_URL
 
 metadata = MetaData()
 
@@ -21,7 +21,7 @@ acts = Table('acts', metadata,
              Column('movie_id', Integer, ForeignKey('movies.movie_id'))
 )
 
-engine = create_engine(engine_url, echo=True)
+engine = create_engine(ENGINE_URL, echo=True)
 
 def create_all():
     metadata.create_all(engine)
