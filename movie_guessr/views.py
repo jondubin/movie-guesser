@@ -28,7 +28,7 @@ def get_movies_from_id(actor_id):
     stmt = select([movies.c.name],
                   and_(actor_id == acts.c.actor_id,
                        acts.c.movie_id == movies.c.movie_id))
-    results = conn.execute(stmt)
+    results = conn.execute(stmt).fetchall()
     movie_list = []
     for result in results:
         print result
