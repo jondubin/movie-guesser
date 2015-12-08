@@ -16,6 +16,7 @@ REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD')
 BING_KEY = os.environ.get('BING_KEY')
 TMDB_KEY = os.environ.get('TMDB_KEY')
 ENGINE_URL = os.environ.get('ENGINE_URL')
+DEBUG = True
 
 from populate_db import engine
 app = Flask(__name__)
