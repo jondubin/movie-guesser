@@ -31,7 +31,8 @@ def get_movies_from_id(actor_id):
     results = conn.execute(stmt)
     movie_list = []
     for result in results:
-        movie_list.append(result[0])
+        print result
+        # movie_list.append(result[0])
     return movie_list
 
 
