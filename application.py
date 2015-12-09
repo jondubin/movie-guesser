@@ -26,7 +26,7 @@ engine = create_engine(ENGINE_URL, echo=True)
 
 application = app = Flask(__name__)
 app.debug = True
-r = redis.StrictRedis(host=REDIS_URL, port=12890, db=0, password=REDIS_PASSWORD)
+r = redis.StrictRedis(host=REDIS_URL, port=6379, db=0, password=REDIS_PASSWORD)
 conn = engine.connect()
 
 from views import *
