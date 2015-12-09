@@ -32,6 +32,7 @@ def get_movies_from_id(actor_id):
     movie_list = []
     for result in results:
         pass
+        print result.encode('utf-8').strip()
         #print unicode(result[0], errors='replace')
         # movie_list.append(result[0])
     return movie_list
