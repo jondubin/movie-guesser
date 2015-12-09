@@ -4,9 +4,9 @@ import os
 import os.path
 import logging
 from sqlalchemy import create_engine
-import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
+# import sys
+# reload(sys)
+# sys.setdefaultencoding('utf8')
 
 if os.path.isfile(os.getcwd() + '/config.py'):
     import config
@@ -32,5 +32,5 @@ conn = engine.connect()
 from views import *
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
 
