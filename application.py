@@ -29,10 +29,6 @@ app.debug = True
 r = redis.StrictRedis(host=REDIS_URL, port=12890, db=0, password=REDIS_PASSWORD)
 conn = engine.connect()
 
-# @app.route('/')
-# def index():
-#     return "hello"
-
 from views import *
 
 if __name__ == '__main__':
