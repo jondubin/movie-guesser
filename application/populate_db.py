@@ -2,7 +2,7 @@ import json
 from sqlalchemy import (Table, Column, Integer,
                         Unicode, MetaData,
                         ForeignKey, create_engine)
-from movie_guessr import ENGINE_URL
+from application import ENGINE_URL
 
 metadata = MetaData()
 

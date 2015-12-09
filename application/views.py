@@ -7,9 +7,9 @@ from populate_db import actors, movies, acts
 import MySQLdb
 import string
 import random
-from movie_guessr import app
-from movie_guessr import conn
-from movie_guessr import r
+from application import app
+from application import conn
+from application import r
 from utils import return_from_cache
 from utils import get_poster_url
 from utils import get_actor_url

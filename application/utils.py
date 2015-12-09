@@ -1,9 +1,9 @@
-from movie_guessr import r
+from application import r
 from flask import send_file
 import requests
 from StringIO import StringIO
 import tmdbsimple as tmdb
-from movie_guessr import TMDB_KEY, BING_KEY
+from application import TMDB_KEY, BING_KEY
 from bing_search_api import BingSearchAPI
 
 tmdb.API_KEY = TMDB_KEY
