@@ -31,7 +31,7 @@ def get_movies_from_id(actor_id):
     results = conn.execute(stmt)
     movie_list = []
     for result in results:
-        print result[0].decode('cp1252')
+        print unicode(result[0], errors='replace')
         # movie_list.append(result[0])
     return movie_list
 
