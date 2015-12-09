@@ -30,7 +30,6 @@ def get_movies_from_id(actor_id):
                        acts.c.movie_id == movies.c.movie_id))
     results = conn.execute(stmt).fetchall()
     movie_list = []
-    print results
     for result in results:
         pass
         #print unicode(result[0], errors='replace')
