@@ -4,6 +4,7 @@ import os
 import os.path
 import logging
 import sys
+reload(sys)
 sys.setdefaultencoding('utf8')
 
 if os.path.isfile(os.getcwd() + '/movie_guessr/config.py'):
