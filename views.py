@@ -28,10 +28,12 @@ def get_movies_from_id(actor_id):
     stmt = select([movies.c.name],
                   and_(actor_id == acts.c.actor_id,
                        acts.c.movie_id == movies.c.movie_id))
-    results = conn.execute(stmt)
+    results = conn.execute(stmt).fetchall()
     movie_list = []
+    print results
     for result in results:
-        print unicode(result[0], errors='replace')
+        pass
+        #print unicode(result[0], errors='replace')
         # movie_list.append(result[0])
     return movie_list
 
