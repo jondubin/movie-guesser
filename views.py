@@ -31,10 +31,12 @@ def get_movies_from_id(actor_id):
     results = conn.execute(stmt).fetchall()
     movie_list = []
     for result in results:
-        pass
-        print result[0].encode('utf-8').strip()
+        # print result[0].encode('utf-8').strip()
         #print unicode(result[0], errors='replace')
-        # movie_list.append(result[0])
+        try:
+            movie_list.append(result[0])
+        except Exception:
+            pass
     return movie_list
 
 
