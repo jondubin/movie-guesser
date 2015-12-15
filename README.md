@@ -10,7 +10,6 @@ to start the server up.
 This file constructs the app object and gets
 things going.
 
-
 ## bing_search_ api.py
 
 This is a library we're using to use the Bing search
@@ -18,12 +17,12 @@ API.
 
 ## config.py
 
-This file contains usernames and passwords we use to
-connect the APIs and databases.
+This file contains usernames, passwords, and keys we use to
+connect to the APIs and databases.
 
 ## populate_db.py
 
-This file contains the code we used to populate
+This file contains the code we use to populate
 our database with the given TMDB json data.
 
 ## runserver.py
