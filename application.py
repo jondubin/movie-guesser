@@ -2,11 +2,7 @@ from flask import Flask
 import redis
 import os
 import os.path
-import logging
 from sqlalchemy import create_engine
-# import sys
-# reload(sys)
-# sys.setdefaultencoding('utf8')
 
 if os.path.isfile(os.getcwd() + '/config.py'):
     import config
